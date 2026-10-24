@@ -102,6 +102,30 @@ class TaskApiTest {
     }
 
     @Test
+    void deleteCompletedTasks_deletesCompletedTasksAndKeepsPendingTasks() throws Exception {
+        long completedId = createTask("{\"title\":\"Completed\",\"status\":\"COMPLETED\"}");
+        long pendingId = createTask("{\"title\":\"Pending\"}");
+
+        mockMvc.perform(delete("/api/tasks/completed"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.deleted").value(1));
+
+        mockMvc.perform(get("/api/tasks/" + completedId)).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/tasks/" + pendingId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("PENDING"));
+    }
+
+    @Test
+    void deleteCompletedTasks_returnsZeroWhenNoneExist() throws Exception {
+        createTask("{\"title\":\"Pending\"}");
+
+        mockMvc.perform(delete("/api/tasks/completed"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.deleted").value(0));
+    }
+
+    @Test
     void missingTask_returns404WithJsonError() throws Exception {
         mockMvc.perform(get("/api/tasks/99999"))
                 .andExpect(status().isNotFound())

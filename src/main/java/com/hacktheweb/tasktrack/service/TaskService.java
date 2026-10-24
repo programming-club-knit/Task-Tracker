@@ -6,6 +6,7 @@ import com.hacktheweb.tasktrack.model.Task;
 import com.hacktheweb.tasktrack.repository.TaskRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -62,6 +63,11 @@ public class TaskService {
     public void delete(Long id) {
         Task task = findById(id);
         repository.delete(task);
+    }
+
+    @Transactional
+    public int deleteCompleted() {
+        return repository.deleteByStatus(Task.Status.COMPLETED);
     }
 
     private String cleanDescription(String description) {

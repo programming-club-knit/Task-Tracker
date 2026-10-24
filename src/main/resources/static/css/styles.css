@@ -174,6 +174,7 @@ textarea { resize: vertical; }
   margin-bottom: var(--space);
 }
 .list-header h2 { margin: 0; }
+.list-header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
 .filters { display: flex; gap: 0.25rem; }
 .filter-button {
   padding: 0.3rem 0.8rem;
@@ -226,4 +227,6 @@ textarea { resize: vertical; }
 @media (max-width: 480px) {
   .field-row { flex-direction: column; gap: 0; }
   .summary-number { font-size: 1.4rem; }
+  .list-header { align-items: flex-start; flex-direction: column; }
+  .list-header-actions { justify-content: flex-start; }
 }

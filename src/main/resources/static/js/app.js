@@ -9,6 +9,7 @@ let currentFilter = 'ALL';
 let editingId = null;    // id of the task being edited, or null when adding
 let isLoading = false;
 let isSubmitting = false;
+let isClearing = false;
 
 // ---------- Element references ----------
 const form = document.getElementById('task-form');
@@ -25,6 +26,7 @@ const loadingText = document.getElementById('loading');
 const emptyText = document.getElementById('empty');
 const messageBox = document.getElementById('message');
 const filterButtons = document.querySelectorAll('.filter-button');
+const clearCompletedButton = document.getElementById('clear-completed-button');
 
 // ---------- API helper ----------
 
@@ -121,6 +123,8 @@ function render() {
     emptyText.textContent = 'No tasks to show.';
   }
 
+  const completedCount = tasks.filter((task) => task.status === 'COMPLETED').length;
+  clearCompletedButton.disabled = isLoading || isClearing || completedCount === 0;
   taskList.replaceChildren(...visibleTasks.map(createTaskElement));
 }
 
@@ -296,6 +300,35 @@ async function deleteTask(task) {
     showMessage(error.message, 'error');
   }
 }
+
+async function clearCompleted() {
+  const completedCount = tasks.filter((task) => task.status === 'COMPLETED').length;
+  if (completedCount === 0 || isClearing) {
+    return;
+  }
+  if (!window.confirm('Clear ' + completedCount + ' completed task' + (completedCount === 1 ? '' : 's') + '? This cannot be undone.')) {
+    return;
+  }
+
+  clearMessage();
+  isClearing = true;
+  render();
+  try {
+    const result = await api(API_URL + '/completed', { method: 'DELETE' });
+    if (editingId !== null && tasks.some((task) => task.id === editingId && task.status === 'COMPLETED')) {
+      resetForm();
+    }
+    showMessage(result.deleted + ' completed task' + (result.deleted === 1 ? '' : 's') + ' cleared.', 'success');
+    await loadTasks();
+  } catch (error) {
+    showMessage(error.message, 'error');
+  } finally {
+    isClearing = false;
+    render();
+  }
+}
+
+clearCompletedButton.addEventListener('click', clearCompleted);
 
 // ---------- Filters ----------
 
