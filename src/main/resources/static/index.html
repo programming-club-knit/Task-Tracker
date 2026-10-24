@@ -79,13 +79,17 @@
       <section aria-labelledby="list-heading" class="panel">
         <div class="list-header">
           <h2 id="list-heading">Your tasks</h2>
-          <div class="list-header-actions">
-            <div class="filters" role="group" aria-label="Filter tasks by status">
-              <button type="button" class="filter-button is-active" data-filter="ALL" aria-pressed="true">All</button>
-              <button type="button" class="filter-button" data-filter="PENDING" aria-pressed="false">Pending</button>
-              <button type="button" class="filter-button" data-filter="COMPLETED" aria-pressed="false">Completed</button>
-            </div>
-            <button type="button" id="clear-completed-button" class="button button-danger">Clear completed</button>
+          <div class="filters" role="group" aria-label="Filter tasks by status">
+            <button type="button" class="filter-button is-active" data-filter="ALL" aria-pressed="true">All</button>
+            <button type="button" class="filter-button" data-filter="PENDING" aria-pressed="false">Pending</button>
+            <button type="button" class="filter-button" data-filter="COMPLETED" aria-pressed="false">Completed</button>
+          </div>
+        </div>
+        <div class="search-controls">
+          <label for="task-search">Search tasks</label>
+          <div class="search-input-wrapper">
+            <input type="search" id="task-search" autocomplete="off">
+            <button type="button" id="clear-search-button" class="button" aria-label="Clear task search">Clear</button>
           </div>
         </div>
 

@@ -6,10 +6,10 @@ const API_URL = '/api/tasks';
 // ---------- State ----------
 let tasks = [];          // latest list from the server
 let currentFilter = 'ALL';
+let searchTerm = '';
 let editingId = null;    // id of the task being edited, or null when adding
 let isLoading = false;
 let isSubmitting = false;
-let isClearing = false;
 
 // ---------- Element references ----------
 const form = document.getElementById('task-form');
@@ -26,7 +26,8 @@ const loadingText = document.getElementById('loading');
 const emptyText = document.getElementById('empty');
 const messageBox = document.getElementById('message');
 const filterButtons = document.querySelectorAll('.filter-button');
-const clearCompletedButton = document.getElementById('clear-completed-button');
+const searchInput = document.getElementById('task-search');
+const clearSearchButton = document.getElementById('clear-search-button');
 
 // ---------- API helper ----------
 
@@ -116,15 +117,23 @@ function render() {
 
   loadingText.hidden = !isLoading;
 
-  const visibleTasks = tasks.filter((task) => currentFilter === 'ALL' || task.status === currentFilter);
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+  const visibleTasks = tasks.filter((task) => {
+    const matchesStatus = currentFilter === 'ALL' || task.status === currentFilter;
+    const matchesSearch = normalizedSearchTerm === ''
+      || task.title.toLowerCase().includes(normalizedSearchTerm)
+      || (task.description || '').toLowerCase().includes(normalizedSearchTerm);
+    return matchesStatus && matchesSearch;
+  });
 
   emptyText.hidden = isLoading || visibleTasks.length > 0;
   if (!emptyText.hidden) {
-    emptyText.textContent = 'No tasks to show.';
+    emptyText.textContent = normalizedSearchTerm === ''
+      ? 'No tasks to show.'
+      : 'No tasks match your search.';
   }
 
-  const completedCount = tasks.filter((task) => task.status === 'COMPLETED').length;
-  clearCompletedButton.disabled = isLoading || isClearing || completedCount === 0;
+  clearSearchButton.disabled = searchTerm === '';
   taskList.replaceChildren(...visibleTasks.map(createTaskElement));
 }
 
@@ -301,34 +310,25 @@ async function deleteTask(task) {
   }
 }
 
-async function clearCompleted() {
-  const completedCount = tasks.filter((task) => task.status === 'COMPLETED').length;
-  if (completedCount === 0 || isClearing) {
-    return;
-  }
-  if (!window.confirm('Clear ' + completedCount + ' completed task' + (completedCount === 1 ? '' : 's') + '? This cannot be undone.')) {
-    return;
-  }
-
-  clearMessage();
-  isClearing = true;
+searchInput.addEventListener('input', () => {
+  searchTerm = searchInput.value;
   render();
-  try {
-    const result = await api(API_URL + '/completed', { method: 'DELETE' });
-    if (editingId !== null && tasks.some((task) => task.id === editingId && task.status === 'COMPLETED')) {
-      resetForm();
-    }
-    showMessage(result.deleted + ' completed task' + (result.deleted === 1 ? '' : 's') + ' cleared.', 'success');
-    await loadTasks();
-  } catch (error) {
-    showMessage(error.message, 'error');
-  } finally {
-    isClearing = false;
+});
+
+searchInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && searchTerm !== '') {
+    searchTerm = '';
+    searchInput.value = '';
     render();
   }
-}
+});
 
-clearCompletedButton.addEventListener('click', clearCompleted);
+clearSearchButton.addEventListener('click', () => {
+  searchTerm = '';
+  searchInput.value = '';
+  render();
+  searchInput.focus();
+});
 
 // ---------- Filters ----------
 

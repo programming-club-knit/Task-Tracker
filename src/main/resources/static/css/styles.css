@@ -174,7 +174,6 @@ textarea { resize: vertical; }
   margin-bottom: var(--space);
 }
 .list-header h2 { margin: 0; }
-.list-header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
 .filters { display: flex; gap: 0.25rem; }
 .filter-button {
   padding: 0.3rem 0.8rem;
@@ -190,6 +189,10 @@ textarea { resize: vertical; }
   background: var(--color-primary);
   border-color: var(--color-primary);
 }
+.search-controls { display: grid; gap: 0.35rem; margin-bottom: var(--space); }
+.search-controls label { font-weight: 600; }
+.search-input-wrapper { display: flex; gap: 0.5rem; }
+.search-input-wrapper input { flex: 1; min-width: 0; }
 
 .state-text { color: var(--color-muted); text-align: center; padding: 1.5rem 0; margin: 0; }
 
@@ -227,6 +230,4 @@ textarea { resize: vertical; }
 @media (max-width: 480px) {
   .field-row { flex-direction: column; gap: 0; }
   .summary-number { font-size: 1.4rem; }
-  .list-header { align-items: flex-start; flex-direction: column; }
-  .list-header-actions { justify-content: flex-start; }
 }
