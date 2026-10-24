@@ -1,0 +1,19 @@
+# Build output
+target/
+*.class
+*.jar
+
+# Local H2 database files (each developer has their own)
+data/
+*.mv.db
+*.trace.db
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Organizer-only answer key. NEVER commit or publish.
+organizer/
